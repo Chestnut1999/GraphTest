@@ -12,7 +12,17 @@ MONSTER GraphTest::mInfo[8] = {
 	//
 };
 PROPERTY GraphTest::pInfo[10] = {
-	//
+	// 道具图片   道具生命值    道具奖励金   图片缩放比率
+	{L"res\\property\\bigmoney.png",2500,2500,0.8},
+	{ L"res\\property\\colors.png",1300,150,0.8 },
+	{ L"res\\property\\crystal.png",670,75,0.8 },
+	{ L"res\\property\\crystals.png",1300,150,0.8 },
+	{ L"res\\property\\house.png",2500,268,0.8 },
+	{ L"res\\property\\red.png",670,75,0.8 },
+	{ L"res\\property\\smallmoney.png",1300,1000,0.8 },
+	{ L"res\\property\\stone.png",1300,150,0.8 },
+	{ L"res\\property\\tree.png",670,75,0.8 },
+	{ L"res\\property\\trees.png",2500,268,0.8 },
 };
 GraphTest::GraphTest(HINSTANCE hInstance, LPCTSTR szWindowClass, LPCTSTR szTitle,
 	WORD Icon, WORD SmIcon, int iWidth, int iHeight) :T_Engine(hInstance,
@@ -31,13 +41,16 @@ void GraphTest::GameInit()
 {
 	LoadMusic();
 	loadMenu();
+	LoadImg();
 }
 
 void GraphTest::GameLogic()
 {
 	if (GameState == GAME_RUN)
 	{
-		
+		total = total - 10;
+		if (total == 0)
+			total = 100;
 	}
 }
 
@@ -57,7 +70,7 @@ void GraphTest::GamePaint(HDC hdc)
 	}
 	else if (GameState == GAME_SCREEN)
 	{
-		p_screenmenu->DrawMenu(hdc);
+		p_screenmenu->DrawMenu(hdc,1,0,255,true);
 		main_menu.DrawMenu(hdc,0.7);
 	}
 	else if (GameState == GAME_ABOUT)
@@ -102,12 +115,28 @@ void GraphTest::GamePaint(HDC hdc)
 		switch (guan)
 		{
 		case 1:
+			LoadGuan();
+			LoadMap("res\\map\\guan1.txt");
+			updateProLife(hdc);
+			t_scence->Draw(hdc, 0, 0);
 			break;
 		case 2:
+			LoadGuan();
+			LoadMap("res\\map\\guan2.txt");
+			updateProLife(hdc);
+			t_scence->Draw(hdc, 0, 0);
 			break;
 		case 3:
+			LoadGuan();
+			LoadMap("res\\map\\guan3.txt");
+			updateProLife(hdc);
+			t_scence->Draw(hdc, 0, 0);
 			break;
 		case 4:
+			LoadGuan();
+			LoadMap("res\\map\\guan4.txt");
+			updateProLife(hdc);
+			t_scence->Draw(hdc, 0, 0);
 			break;
 		}
 		run_menu.DrawMenu(hdc);
@@ -396,7 +425,7 @@ void GraphTest::loadMenu()
 	wstring menuItems[] = { L"新游戏",L"退出游戏" };
 	wstring aboutMenuItems[] = { L"返回",L"退出游戏" };
 	wstring setItems[] = { L" " };
-	wstring chooseItems[] = { L" ",L"",L"",L"",L"",L"",L"",L"",L"" };
+	wstring chooseItems[] = { L"1 ",L"2",L"3",L"4",L"5",L"6",L"7",L"8",L"9" };
 	wstring setmItems[] = { L"返回" };
 	MENUITEM mItem;
 
@@ -510,7 +539,7 @@ void GraphTest::loadMenu()
 	setMenu(&main_menu, btn_width, btn_height, L"res\\menu\\hh.png", setItems);
 
 	bg_buffer.Play(true);
-	GameState = GAME_SETTING;
+	GameState = GAME_START;
 }
 void GraphTest::stopClickMusic(AudioDXBuffer button_click_buffer, AudioDXBuffer button_move_buffer)
 {
@@ -566,14 +595,16 @@ void GraphTest::LoadMap(char* path)
 	t_scence->LoadTxtMap(path);
 	scn_width = t_scence->getSceneLayers()->back().layer->GetWidth();
 	scn_height = t_scence->getSceneLayers()->back().layer->GetHeight();
+	// 视图初始位置以地图作为参照
 	int scn_x = (wnd_width - scn_width) / 2;
 	int scn_y = (wnd_height - scn_height) / 2;
+	// 将游戏地图初始化为屏幕中央位置
 	t_scence->InitScene(scn_x, scn_y, scn_width, scn_height, wnd_width, wnd_height);
+	// 将所有地图图层定位在屏幕中央
 	SCENE_LAYERS::iterator p;
 	for (p = t_scence->getSceneLayers()->begin(); p != t_scence->getSceneLayers()->end(); p++)
 	{
-		if (p->layer->ClassName() == "T_Map")
-			p->layer->SetPosition(scn_x, scn_y);
+		if (p->layer->ClassName() == "T_Map") p->layer->SetPosition(scn_x, scn_y);
 	}
 }
 
@@ -627,6 +658,12 @@ void GraphTest::LoadBomb()
 {
 }
 
+void GraphTest::LoadImg()
+{
+	blood0 = new T_Graph(L"res\\property\\blood1.png");
+	blood1 = new T_Graph(L"res\\property\\blood.png");
+}
+
 void GraphTest::updatePlayerLife()
 {
 }
@@ -655,10 +692,20 @@ void GraphTest::updateNPCLife()
 {
 }
 
-void GraphTest::updateProLife()
+void GraphTest::updateProLife(HDC hdc)
 {
+	blood1->PaintImage(hdc, px[0], py[0], blood1->GetImageWidth(), blood1->GetImageHeight(), 255);
+	int x = px[0] + blood1->GetImageWidth()* (total - 10) / total;
+	int sx = blood1->GetImageWidth()* (total - 10) / total;
+	int rw = blood1->GetImageWidth()* 10 / total + 1;
+	
+	blood0->PaintRegion(blood0->GetBmpHandle(), hdc,x,py[0],sx,0,rw,blood0->GetImageHeight(),1);
 }
 
 void GraphTest::LoadGuan()
 {
+	t_scence = new T_Scene();
+	
+	px[0] = 71 * 17;
+	py[0] = 71 * 6;
 }

@@ -48,6 +48,8 @@ private:
 	T_Graph* lifeImg;				//萝卜生命图片
 	T_Graph* wavenumImg;			//菜单中总波数图片
 	T_Graph* waveImg;				//菜单中当前波数图片
+	T_Graph* blood1;				//满血
+	T_Graph* blood0;				//空血
 
 	//----------菜单类对象-----------
 	T_Menu t_menu;                  //游戏菜单类的对象
@@ -76,7 +78,7 @@ private:
 
 	//---------游戏其他类对象---------
 	T_Scene* t_scence;					//游戏场景
-
+	T_Scene ts;
 
 	//----------游戏角色相关集合-------------
 	vSpriteSet npc_set;					//NPC角色集合
@@ -87,6 +89,9 @@ private:
 	//----------关卡常量----------
 	int guanNum = 4;					//总关卡数
 	int guan = 0;						//当前关卡
+	int pnum;							//道具数量
+	int px[35];							//道具的x坐标
+	int py[35];							//道具的y坐标
 	int lifeNum = 10;					//总生命值
 	int life = 10;						//当前生命值
 	int	waveNum[4] = { 6,10,12,12 };	//每一关总波数
@@ -116,6 +121,7 @@ private:
 	void LoadMusic();		//加载音乐
 	void LoadExplosion();	//加载爆炸效果
 	void LoadBomb();		//加载子弹
+	void LoadImg();			//加载图片
 
 	//---------更新---------------------
 	void updatePlayerLife();	//更新萝卜生命
@@ -125,12 +131,14 @@ private:
 	void updateLuo();			//更新萝卜状态
 	void updatePlayerLevel();	//更新炮塔等级
 	void updateNPCLife();		//更新每一波怪物信息
-	void updateProLife();		//更新道具信息
+	void updateProLife(HDC hdc);		//更新道具信息
 	void stopClickMusic(AudioDXBuffer button_click_buffer, AudioDXBuffer button_move_buffer);
 
 	//----------关卡----------------
 	void LoadGuan();			//初始关卡信息
 
+	//测试
+	int total = 100;
 public:
 	GraphTest(HINSTANCE hInstance, LPCTSTR szWindowClass, LPCTSTR szTitle,
 		WORD Icon = NULL, WORD SmIcon = NULL,

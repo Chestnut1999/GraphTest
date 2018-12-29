@@ -378,6 +378,42 @@ void T_Graph::PaintBlank(HDC hdc, int x, int y, int width, int height, COLORREF 
 	DeleteObject(hBrush);
 }
 
+void T_Graph::PaintBlank(HDC hdc, int x, int y, int width, int height, COLORREF crColor, int alpLevel, int n)
+{
+	HBITMAP hbitmap = CreateCompatibleBitmap(hdc, width, height);
+	HDC memdc = ::CreateCompatibleDC(NULL);
+	HBITMAP OldBmp = (HBITMAP)SelectObject(memdc, hbitmap);
+	HBRUSH hBrush = CreateSolidBrush(crColor);
+	//Brush* redBrush = new Brush(RGB(198,198,198));
+	RECT rcBitmap = { x, y, width, height };
+	Graphics graphics(hdc);
+	REAL c = 0;
+	REAL b = 360;
+	//graphics.FillPie(redBrush, rcBitmap,c,b);
+
+	BLENDFUNCTION frame_bf;
+	frame_bf.BlendOp = AC_SRC_OVER;
+	frame_bf.BlendFlags = 0;
+	frame_bf.SourceConstantAlpha = alpLevel;
+	frame_bf.AlphaFormat = 0;
+	AlphaBlend(hdc, x, y, width, height, memdc, 0, 0, width, height, frame_bf);
+
+	// 恢复内存设备中的位图对象
+	SelectObject(memdc, OldBmp);
+	// 删除内存设备
+	DeleteDC(memdc);
+	// 删除位图对象
+	DeleteObject(OldBmp);
+	// 释放句柄
+	OldBmp = NULL;
+	// 删除位图对象
+	DeleteObject(hbitmap);
+	// 释放句柄
+	hbitmap = NULL;
+	// 删除笔刷
+	DeleteObject(hBrush);
+}
+
 void T_Graph::PaintBlank(HBITMAP hbmp, int width, int height, COLORREF crColor)
 {
 	HDC memdc = ::CreateCompatibleDC(NULL);

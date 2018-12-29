@@ -74,7 +74,8 @@ public:
 		                   int width, int height, Color crColor);
 	static void PaintBlank(HDC hdc, int x, int y, int width, int height, 
 		                   COLORREF crColor, int alpLevel);
-
+	static void PaintBlank(HDC hdc, int x, int y, int width, int height,
+							COLORREF crColor, int alpLevel,int n);
 	static void PaintText(HDC hdc, RectF fontRect, wstring text,
 		                  REAL fontSize, wstring fontName,
 		                  Color fontColor = Color::White,

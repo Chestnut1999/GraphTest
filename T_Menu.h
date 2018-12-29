@@ -61,6 +61,7 @@ public:
 
 	//菜单绘制: btnTrans按钮透明度, 255不透明; startState是否绘制开始菜单
 	void DrawMenu(HDC hdc, float ratio = 1,BYTE btnTrans=255, bool startState=true);
+	void DrawMenu(HDC hdc, float ratio, int n, BYTE btnTrans, bool startState);
 
 	int MenuMouseClick(int x, int y);					// 菜单鼠标点击事件处理
 	void MenuMouseMove(int x, int y);					// 菜单鼠标移动事件处理

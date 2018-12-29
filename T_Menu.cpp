@@ -182,7 +182,114 @@ void T_Menu::DrawMenu(HDC hdc, float ratio,BYTE btnTrans, bool startState)
 		}
 	}
 }
+//菜单绘制重载
+void T_Menu::DrawMenu(HDC hdc, float ratio, int n,BYTE btnTrans, bool startState)
+{
+	if (&gm_menuBkg != NULL && startState == true)
+	{
+		HBITMAP tBmp = T_Graph::CreateBlankBitmap(WIN_WIDTH, WIN_HEIGHT, bkColor);
+		SelectObject(hdc, tBmp);
 
+		gm_menuBkg.PaintImage(hdc, 0, 0, WIN_WIDTH, WIN_HEIGHT, bkImageAlpha);
+
+		DeleteObject(tBmp);
+		tBmp = NULL;
+	}
+	else
+	{
+		T_Graph::PaintBlank(hdc, 0, 0, WIN_WIDTH, WIN_HEIGHT, MENU_BKCLR, MENU_ALPHA);
+	}
+
+	int w = menu_info.width;
+	int h = menu_info.height;
+
+	int FontHeight;
+	int px = 0;
+	int w_px = w / (MaxMenuItemLen + 1);	//计算每个字所占的像素
+	int h_px = (int)((float)(h / 2.5));
+	if (w_px > h_px)
+	{
+		px = h_px;
+	}
+	else
+	{
+		px = w_px;
+	}
+	FontHeight = (px * 72) / 96 - 7;		//根据每个字的像素计算字号
+
+	if (isItemFocused == FALSE)
+	{
+		Gdiplus::RectF Rec;
+		vector<MENUITEM>::iterator iter;
+		for (iter = gm_menuItems.begin(); iter != gm_menuItems.end(); iter++)
+		{
+			int x = iter->pos.x;
+			int y = iter->pos.y;
+
+			// 绘制按钮图像
+			if (&BtnDIB != NULL)
+			{
+				BtnDIB.PaintRegion(BtnDIB.GetBmpHandle(), hdc, x, y, 0, 0, w, h, ratio, 0, btnTrans);
+			}
+			Rec.X = (float)x + 50;
+			Rec.Y = (float)y + 50;
+			Rec.Width = (float)w - 42;
+			Rec.Height = (float)h - 42;
+			
+
+			// 绘制按钮文字
+			wstring item = iter->ItemName.c_str();
+			T_Graph::PaintBlank(hdc, Rec.X, Rec.Y, Rec.Width, Rec.Height, Color::Gray,80,1);
+			T_Graph::PaintText(hdc, Rec, item, (REAL)FontHeight, menu_info.fontName,
+				Color::White, GetFontStyle(), GetAlignment());
+		}
+	}
+
+	if (isItemFocused == TRUE)
+	{
+		int mIndex = 0;
+		Gdiplus::RectF Rec;
+		vector<MENUITEM>::iterator iter;
+		for (iter = gm_menuItems.begin(); iter != gm_menuItems.end(); iter++)
+		{
+			int x = iter->pos.x;
+			int y = iter->pos.y;
+
+			Rec.X = (float)x + 50;
+			Rec.Y = (float)y + 50;
+			Rec.Width = (float)w - 42;
+			Rec.Height = (float)h - 42;
+
+			if (mIndex != m_index)
+			{
+				if (&BtnDIB != NULL)
+				{
+					BtnDIB.PaintRegion(BtnDIB.GetBmpHandle(), hdc, x, y, 0, 0, w, h, ratio, 0, btnTrans);
+				}
+
+				wstring item = iter->ItemName.c_str();
+				T_Graph::PaintBlank(hdc, Rec.X, Rec.Y, Rec.Width, Rec.Height, Color::Gray, 80);
+				T_Graph::PaintText(hdc, Rec, item, (REAL)FontHeight, menu_info.fontName,
+					Color::White, GetFontStyle(), GetAlignment());
+			}
+
+			if (mIndex == m_index)
+			{
+				if (&BtnDIB != NULL)
+				{
+					BtnDIB.PaintRegion(BtnDIB.GetBmpHandle(), hdc, x, y, 0, h, w, h, ratio, 0, btnTrans);
+				}
+
+				wstring item = iter->ItemName.c_str();
+				T_Graph::PaintBlank(hdc, Rec.X, Rec.Y, Rec.Width, Rec.Height, Color::Gray, 80);
+				T_Graph::PaintText(hdc, Rec, item, (REAL)FontHeight, menu_info.fontName,
+					Color::White, GetFontStyle(), GetAlignment());
+			}
+
+			mIndex = mIndex + 1;
+		}
+	}
+}
 //根据当前鼠标坐标计算菜单项索引号
 int T_Menu::GetMenuIndex(int x, int y)
 {
